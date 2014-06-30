@@ -153,6 +153,7 @@ Generator.prototype.welcome = function welcome() {
 Generator.prototype.askForMongo = function askForMongo() {
   var cb = this.async();
 
+  /*
   this.prompt([{
     type: 'confirm',
     name: 'mongo',
@@ -167,8 +168,15 @@ Generator.prototype.askForMongo = function askForMongo() {
       return props.mongo;
     }
   }], function (props) {
-    this.mongo = props.mongo;
+  */
+  this.prompt([{
+    type: 'confirm',
+    name: 'mongoPassportUser',
+    message: 'Would you like to include a Passport authentication boilerplate?',
+    default: false,
+  }], function (props) {
     this.mongoPassportUser = props.mongoPassportUser;
+    this.env.options.mongoPassportUser = this.mongoPassportUser ;
     cb();
   }.bind(this));
 };
