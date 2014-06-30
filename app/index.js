@@ -90,7 +90,8 @@ var Generator = module.exports = function Generator(args, options) {
 
     var enabledComponents = ['angular-sanitize/angular-sanitize.js','angular-route/angular-route.js'];
 
-    if (this.mongoPassportUser) {
+    //if (this.mongoPassportUser) {
+    if (this.cookiesModule) {
       enabledComponents.push('angular-cookies/angular-cookies.js');
     }
 
@@ -147,6 +148,29 @@ Generator.prototype.welcome = function welcome() {
       );
     }
   }
+};
+
+Generator.prototype.askForMongo = function askForMongo() {
+  var cb = this.async();
+
+  this.prompt([{
+    type: 'confirm',
+    name: 'mongo',
+    message: 'Would you like to include MongoDB with Mongoose?',
+    default: false
+  }, {
+    type: 'confirm',
+    name: 'mongoPassportUser',
+    message: 'Would you like to include a Passport authentication boilerplate?',
+    default: false,
+    when: function (props) {
+      return props.mongo;
+    }
+  }], function (props) {
+    this.mongo = props.mongo;
+    this.mongoPassportUser = props.mongoPassportUser;
+    cb();
+  }.bind(this));
 };
 
 //Generator.prototype.askForMongo = function askForMongo() {
@@ -488,5 +512,5 @@ Generator.prototype.mongoFiles = function () {
   this.template('../../templates/express/controllers/session.js', 'lib/controllers/session.js');
   this.template('../../templates/express/controllers/users.js', 'lib/controllers/users.js');
   // tests
-  this.template('../../templates/express/test/user/model.js', 'test/server/user/model.js');  
+  this.template('../../templates/express/test/user/model.js', 'test/server/user/model.js');
 };

@@ -1,9 +1,9 @@
 'use strict';
 
-var express = require('express'),
+var express = require('express')<% if (mongo) { %>,
     path = require('path'),
     fs = require('fs'),
-    mongoose = require('mongoose'),
+    mongoose = require('mongoose')<% } %>,
     formsAngular = require('forms-angular');
 
 /**
@@ -13,8 +13,19 @@ var express = require('express'),
 // Set default node environment to development
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-var config = require('./lib/config/config');
+var config = require('./lib/config/config');<% if (mongo) { %>
 mongoose.connect(config.mongo.uri, config.mongo.options);
+// Bootstrap Models
+// non forms-angular controlled models
+var modelsPath = path.join(__dirname, 'lib/models');
+fs.readdirSync(modelsPath).forEach(function (file) {
+  if (/(.*)\.(js$|coffee$)/.test(file)) {
+    require(modelsPath + '/' + file);
+  }
+});
+
+// Populate empty non forms-angular DB with sample data as there is no interface to create it
+require('./lib/config/dummydata');<% } %>
 
 <% if(mongoPassportUser) { %>
 // Passport Configuration
@@ -28,15 +39,7 @@ require('./lib/config/express')(app);
 var DataFormHandler = new (formsAngular)(app, {
   urlPrefix: '/api/' <% if(jqUpload) { %>, JQMongoFileUploader: {} <% } %>
   });
-
-// Bootstrap Models
-// non forms-angular controlled models
-var modelsPath = path.join(__dirname, 'lib/models');
-fs.readdirSync(modelsPath).forEach(function (file) {
-  if (/(.*)\.(js$|coffee$)/.test(file)) {
-    require(modelsPath + '/' + file);
-  }
-});
+<% if (mongo) { %>
 // Bootstrap forms-angular controlled models
 modelsPath = path.join(__dirname, 'lib/fng-models');
 fs.readdirSync(modelsPath).forEach(function (file) {
@@ -46,8 +49,8 @@ fs.readdirSync(modelsPath).forEach(function (file) {
   }
 });
 
-// Populate empty non forms-angular DB with sample data as there is no interface to create it
-require('./lib/config/dummydata');
+<% } %>
+
 
 require('./lib/routes')(app);
 

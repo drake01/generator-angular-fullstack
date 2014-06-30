@@ -1,16 +1,16 @@
 'use strict';
 
-angular.module('<%= scriptAppName %>', [<%= angularModules %>])
-<% if (ngRoute) { %>
+angular.module('<%= scriptAppName %>', [<%= angularModules %>])<% if (ngRoute) { %>
   .config(['formRoutesProvider' <% if (mongoPassportUser) { %>, $httpProvider<% } %>,
-  function (formRoutes <% if (mongoPassportUser) { %>, $httpProvider<% }  %>) {
+  function (formRoutes <% if (mongoPassportUser) { %>, $http<% }  %>) {
     formRoutes.setRoutes([
       {route: '/index', options: {templateUrl: 'partials/main', controller: 'MainCtrl'}},
-      {route: '/404', options: {templateUrl: 'partials/404.html'}}<% if (mongoPassportUser) { %>,
+      <% if (mongoPassportUser) { %>
       {route: '/login', options: {templateUrl: 'partials/login', controller: 'LoginCtrl'}},
       {route: '/signup', options: {templateUrl: 'partials/signup', controller: 'SignupCtrl'}},
-      {route: '/settings', options: {templateUrl: 'partials/settings', controller: 'SettingsCtrl', authenticate: true}}<% } %>
-    ], '/index');
+      {route: '/settings', options: {templateUrl: 'partials/settings', controller: 'SettingsCtrl', authenticate: true}}, <% } %>
+    {route: '/404', options: {templateUrl: 'partials/404.html'}}
+    ] ,'/');
 
     <% if (mongoPassportUser) { %>
     // Intercept 401s and redirect you to login
@@ -18,7 +18,7 @@ angular.module('<%= scriptAppName %>', [<%= angularModules %>])
       return {
         'responseError': function(response) {
           if(response.status === 401) {
-            $location.path('/login');
+            $location.path('partials/login');
             return $q.reject(response);
           }
           else {
@@ -27,17 +27,18 @@ angular.module('<%= scriptAppName %>', [<%= angularModules %>])
         }
       };
     }]);
-  })
+ <%}%> }])
+<% if (mongoPassportUser) { %>
   .run(function ($rootScope, $location, Auth) {
 
     // Redirect to login if route requires auth and you're not logged in
     $rootScope.$on('$routeChangeStart', function (event, next) {
-      
+
       if (next.authenticate && !Auth.isLoggedIn()) {
         $location.path('/login');
       }
-    });<% } %>
-  }])<% } %>;
+    }); }
+  ) <%}%> <%}%>;
 
 formsAngular.config(['urlServiceProvider', 'cssFrameworkServiceProvider', function (urlService, cssFrameworkService) {
   urlService.setOptions({html5Mode: true});
