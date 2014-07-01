@@ -1,16 +1,16 @@
 'use strict';
 
 angular.module('<%= scriptAppName %>', [<%= angularModules %>])<% if (ngRoute) { %>
-  .config(['formRoutesProvider' <% if (mongoPassportUser) { %>, $httpProvider<% } %>,
-  function (formRoutes <% if (mongoPassportUser) { %>, $http<% }  %>) {
+  .config(['formRoutesProvider' <% if (mongoPassportUser) { %>, '$httpProvider'<% } %>,
+  function (formRoutes <% if (mongoPassportUser) { %>, $httpProvider<% }  %>) {
     formRoutes.setRoutes([
-      {route: '/index', options: {templateUrl: 'partials/main', controller: 'MainCtrl'}},
+      {route: '/', options: {templateUrl: 'partials/main', controller: 'MainCtrl'}},
       <% if (mongoPassportUser) { %>
       {route: '/login', options: {templateUrl: 'partials/login', controller: 'LoginCtrl'}},
       {route: '/signup', options: {templateUrl: 'partials/signup', controller: 'SignupCtrl'}},
       {route: '/settings', options: {templateUrl: 'partials/settings', controller: 'SettingsCtrl', authenticate: true}}, <% } %>
     {route: '/404', options: {templateUrl: 'partials/404.html'}}
-    ] ,'/');
+    ] ,'/index');
 
     <% if (mongoPassportUser) { %>
     // Intercept 401s and redirect you to login

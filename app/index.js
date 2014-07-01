@@ -88,10 +88,28 @@ var Generator = module.exports = function Generator(args, options) {
       callback: this._injectDependencies.bind(this)
     });
 
-    var enabledComponents = ['angular-sanitize/angular-sanitize.js','angular-route/angular-route.js'];
+    //var enabledComponents = ['angular-sanitize/angular-sanitize.js','angular-route/angular-route.js'];
+    //var enabledComponents = [];
+    var enabledComponents = [];
 
-    //if (this.mongoPassportUser) {
+    if (this.resourceModule) {
+      enabledComponents.push('angular-resource/angular-resource.js');
+    }
+
     if (this.cookiesModule) {
+      enabledComponents.push('angular-cookies/angular-cookies.js');
+    }
+
+    if (this.sanitizeModule) {
+      enabledComponents.push('angular-sanitize/angular-sanitize.js');
+    }
+
+    if (this.routeModule) {
+      enabledComponents.push('angular-route/angular-route.js');
+    }
+
+    if (this.mongoPassportUser) {
+    //if (this.cookiesModule) {
       enabledComponents.push('angular-cookies/angular-cookies.js');
     }
 
@@ -243,6 +261,28 @@ Generator.prototype.askForPlugins = function askForPlugins() {
 
     var angMods = ['\'formsAngular\''];
 
+    this.resourceModule = true;
+    this.cookiesModule = true;
+    this.sanitizeModule = true;
+
+    if (this.cookiesModule) {
+      angMods.push("'ngCookies'");
+    }
+
+    if (this.resourceModule) {
+      angMods.push("'ngResource'");
+    }
+    if (this.sanitizeModule) {
+      angMods.push("'ngSanitize'");
+    }
+    if (this.routeModule) {
+      angMods.push("'ngRoute'");
+      this.env.options.ngRoute = true;
+    }
+    if (angMods.length) {
+      this.env.options.angularDeps = "\n  " + angMods.join(",\n  ") +"\n";
+    }
+
     for (var i=0; i < prompts[0].choices.length; i++) {
       var mod = prompts[0].choices[i].value;
       this[mod] = props.plugins.indexOf(mod) !== -1;
@@ -253,7 +293,6 @@ Generator.prototype.askForPlugins = function askForPlugins() {
         }
       }
     }
-    this.env.options.angularDeps = "\n  " + angMods.join(",\n  ") +"\n";
     cb();
   }.bind(this));
 };
