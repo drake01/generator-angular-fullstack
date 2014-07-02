@@ -5,22 +5,25 @@
     <h1>Login</h1>
     <p>Accounts are reset on server restart from <code>dummydata.js</code>. Default account is <code>test@test.com</code> / <code>test</code></p>
   </div>
+
   <div class="col-sm-12">
     <form class="form" name="form" ng-submit="login(form)" novalidate>
-<div ng-init="loginForm=[
-        {name:'email',id:'email',label:'Email',required:true,class:'form-group'},
-        {name:'password',type:'password',id:'password',label:'Password',required:true,class:'form-group'}
-        ]" >
-        <form-input name="form" formstyle="vertical" schema="loginForm" model="user"> </form-input>
-      <div class="form-group has-error">
-        <p class="help-block" ng-show="form.email.$error.required && form.password.$error.required && submitted">
-           Please enter your email and password.
-        </p>              
-        <p class="help-block">{{ errors.other }}</p>
-      </div>
-      <button type="submit" class="btn btn-lg btn-primary"> Sign in </button>
+        <div ng-init="loginForm=[
+                {name:'email',id:'email',label:'Email',required:true,class:'form-group'},
+                {name:'password',type:'password',id:'password',label:'Password',required:true,class:'form-group'}
+                ]" >
+                <form-input name="form" formstyle="vertical" schema="loginForm" model="user"> </form-input>
+              <div class="form-group has-error">
+                <p class="help-block" ng-show="form.email.$error.required && form.password.$error.required && submitted">
+                   Please enter your email and password.
+                </p>              
+                <p class="help-block">{{ errors.other }}</p>
+              </div>
+              <button type="submit" class="btn btn-lg btn-primary"> Sign in </button>
+        </div>
+    </form>
+  </div>
 </div>
-</form>
 
 <div class="row">
   <div class="col-sm-12">
