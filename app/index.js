@@ -90,7 +90,32 @@ var Generator = module.exports = function Generator(args, options) {
 
     var enabledComponents = ['angular-sanitize/angular-sanitize.js','angular-route/angular-route.js'];
 
+    //var enabledComponents = ['angular-sanitize/angular-sanitize.js','angular-route/angular-route.js'];
+    var enabledComponents = [];
+
+    if (this.resourceModule) {
+      enabledComponents.push('angular-resource/angular-resource.js');
+    }
+
+    if (this.cookiesModule) {
+      enabledComponents.push('angular-cookies/angular-cookies.js');
+    }
+
+    if (this.sanitizeModule) {
+      enabledComponents.push('angular-sanitize/angular-sanitize.js');
+    }
+
+    if (this.routeModule) {
+      if (this.chosenRouter == 'ngRoute') {
+        enabledComponents.push('angular-route/angular-route.js');
+      }
+      else {
+        enabledComponents.push('fng-ui-router/bower_components/angular-ui-router/release/angular-ui-router.js');
+      }
+    }
+
     if (this.mongoPassportUser) {
+    //if (this.cookiesModule) {
       enabledComponents.push('angular-cookies/angular-cookies.js');
     }
 
@@ -128,9 +153,6 @@ Generator.prototype.welcome = function welcome() {
   this.jqUpload = false;
 
   this.routeModule = true;       // we will have choice between ngRoute and ui-router
-  if (this.routeModule) {
-    this.env.options.ngRoute = true;
-  }
 
   if (!this.options['skip-welcome-message']) {
     console.log(this.yeoman);
@@ -147,6 +169,43 @@ Generator.prototype.welcome = function welcome() {
       );
     }
   }
+};
+
+Generator.prototype.askForRouter = function askForRouter() {
+    if (this.routeModule) {
+      var cb = this.async();
+      var prompts = [{
+        type: 'list',
+        name: 'router',
+        message: 'Which one of the Routers would you like to choose?',
+        choices: [{
+          name: 'Angular-route',
+          value: 'Angular-route',
+          chosenRouter: 'ngRoute',
+        },{
+          name: 'fng-ui-router',
+          value: 'fng-ui-router',
+          chosenRouter: 'fng-ui-router',
+        }
+        ]
+      }];
+
+      this.prompt(prompts, function (props) {
+        this.chosenRouter = '';
+        for (var i=0; i < prompts[0].choices.length; ++i) {
+          var mod = prompts[0].choices[i].value;
+          this[mod] = props.router.indexOf(mod) !== -1;
+          if (this[mod]) {
+            this.chosenRouter = prompts[0].choices[i].chosenRouter;
+            console.log(this.chosenRouter);
+            //this.env.options.ngRoute = true;
+            this.env.options.ngRoute = (this.chosenRouter == 'ngRoute');
+            this.env.options.chosenRouter = this.chosenRouter;
+          }
+        }
+        cb();
+      }.bind(this));
+    }
 };
 
 //Generator.prototype.askForMongo = function askForMongo() {
@@ -211,6 +270,33 @@ Generator.prototype.askForPlugins = function askForPlugins() {
 
     var angMods = ['\'formsAngular\''];
 
+    this.resourceModule = true;
+    this.cookiesModule = true;
+    this.sanitizeModule = true;
+
+    if (this.cookiesModule) {
+      angMods.push("'ngCookies'");
+    }
+
+    if (this.resourceModule) {
+      angMods.push("'ngResource'");
+    }
+    if (this.sanitizeModule) {
+      angMods.push("'ngSanitize'");
+    }
+    if (this.routeModule) {
+      if (this.chosenRouter == 'ngRoute') {
+        angMods.push("'ngRoute'");
+        this.env.options.ngRoute = true;
+      }
+      else {
+        angMods.push("'fng-ui-router'");
+      }
+    }
+    if (angMods.length) {
+      this.env.options.angularDeps = "\n  " + angMods.join(",\n  ") +"\n";
+    }
+
     for (var i=0; i < prompts[0].choices.length; i++) {
       var mod = prompts[0].choices[i].value;
       this[mod] = props.plugins.indexOf(mod) !== -1;
@@ -221,7 +307,7 @@ Generator.prototype.askForPlugins = function askForPlugins() {
         }
       }
     }
-    this.env.options.angularDeps = "\n  " + angMods.join(",\n  ") +"\n";
+    //this.env.options.angularDeps = "\n  " + angMods.join(",\n  ") +"\n";
     cb();
   }.bind(this));
 };
@@ -488,5 +574,5 @@ Generator.prototype.mongoFiles = function () {
   this.template('../../templates/express/controllers/session.js', 'lib/controllers/session.js');
   this.template('../../templates/express/controllers/users.js', 'lib/controllers/users.js');
   // tests
-  this.template('../../templates/express/test/user/model.js', 'test/server/user/model.js');  
+  this.template('../../templates/express/test/user/model.js', 'test/server/user/model.js');
 };
