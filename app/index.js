@@ -110,7 +110,7 @@ var Generator = module.exports = function Generator(args, options) {
         enabledComponents.push('angular-route/angular-route.js');
       }
       else {
-        enabledComponents.push('fng-ui-router/bower_components/angular-ui-router/release/angular-ui-router.js');
+        enabledComponents.push('forms-angular/bower_components/fng-ui-router/bower_components/angular-ui-router/release/angular-ui-router.js');
       }
     }
 
@@ -197,7 +197,6 @@ Generator.prototype.askForRouter = function askForRouter() {
           this[mod] = props.router.indexOf(mod) !== -1;
           if (this[mod]) {
             this.chosenRouter = prompts[0].choices[i].chosenRouter;
-            console.log(this.chosenRouter);
             //this.env.options.ngRoute = true;
             this.env.options.ngRoute = (this.chosenRouter == 'ngRoute');
             this.env.options.chosenRouter = this.chosenRouter;
