@@ -40,8 +40,55 @@ angular.module('<%= scriptAppName %>', [<%= angularModules %>])<% if (chosenRout
     }); }
   ) <%}%> <%}%>;
 <% } else { %>
+.config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
+  $stateProvider
+    .state('/', {
+      url: '/',
+      templateUrl: '../views/partials/main.html'
+    })<% if (mongoPassportUser) { %>
+    .state('login', {
+      url: '/login',
+      templateUrl: '../views/partials/login.html'
+    })
+    .state('signup', {
+      url: '/signup',
+      templateUrl: '../views/partials/signup.html'
+    })
+    .state('settings', {
+      url: '/settings',
+      templateUrl: '../views/partials/settings.html'
+    })
+    <%}%>;
+  $urlRouterProvider.otherwise('/');
+
+    <% if (mongoPassportUser) { %>
+    // Intercept 401s and redirect you to login
+    $httpProvider.interceptors.push(['$q', '$location', function($q, $location) {
+      return {
+        'responseError': function(response) {
+          if(response.status === 401) {
+            $location.path('partials/login');
+            return $q.reject(response);
+          }
+          else {
+            return $q.reject(response);
+          }
+        }
+      };
+    }]);
+ <%}%> })
+<% if (mongoPassportUser) { %>
+  .run(function ($rootScope, $location, Auth) {
+
+    // Redirect to login if route requires auth and you're not logged in
+    $rootScope.$on('$routeChangeStart', function (event, next) {
+
+      if (next.authenticate && !Auth.isLoggedIn()) {
+        $location.path('/login');
+      }
+    }); }
+  ) <%}%> <%}%>;
 // fng ui route code comes here.
-<% } %>
   // Following code doesn't work with mongoPassportUser enabled. Nesting
   // of conditionals is buggy.
   /*

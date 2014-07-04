@@ -289,6 +289,7 @@ Generator.prototype.askForPlugins = function askForPlugins() {
         this.env.options.ngRoute = true;
       }
       else {
+        //angMods.push("'ui.router'");
         angMods.push("'fng-ui-router'");
       }
     }
